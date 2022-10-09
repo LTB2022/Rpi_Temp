@@ -6,7 +6,7 @@
 # visit https://robu.in for more information
 # https://robu.in/developing-simple-gui-using-tkinter-to-control-gpios-of-raspberry-pi/
 
-import Tkinter as Tk   # importing Tkinter Library
+import tkinter as Tk   # importing Tkinter Library
 # import tkFont
 import RPi.GPIO as GPIO   # importing GPIO library
 
