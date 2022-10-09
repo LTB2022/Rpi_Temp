@@ -3,9 +3,10 @@
 # File name: simpleTkGUI.py
 # Attempting to use this working example as inspiration for the ltb
 # The code is being tested and debugged, 2022-10-09, Connor Sheeran
+# This code successfully displays a GUI on the Raspberry PiTFT screen using a Pi400 (not yet PiZero W).
+# The GUI interacts well with the screen buttons and externial GPIO outputs
 
-# This code has been written by Robu.in
-# visit https://robu.in for more information
+# This code was initially inspired by:
 # https://robu.in/developing-simple-gui-using-tkinter-to-control-gpios-of-raspberry-pi/
 
 
