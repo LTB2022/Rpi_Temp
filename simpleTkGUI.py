@@ -1,4 +1,4 @@
-# Write your code here :-)
+# File name: simpleTkGUI.py
 # Attempting to use this working example as inspiration for the ltb
 # The code is being tested and debugged, 2022-10-09, Connor Sheeran
 
