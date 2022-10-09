@@ -53,7 +53,7 @@ def exitProgram():
 win.title("ltb Home")  # title for window
 win.geometry('800x500')  # Dimensions of the window, 320x240 is the dimensions of the adafruit PiTFT capacitive screen
 win.eval('tk::PlaceWindow . center')  #Place the window in the center of the screen, Q: is the Raspberry Screen setup correctly?
-win.attributes('fullscreen', True)  # Makes the window fullscreen, use alt+F4 to close the window
+win.attributes('-fullscreen', True)  # Makes the window fullscreen, use alt+F4 to close the window
 
 # Define the tkinter button instance(s)
 exitButton = Button(win, text="Exit", font=myFont, command=exitProgram, height=2 , width=6)  # setting button naming exitbutton
