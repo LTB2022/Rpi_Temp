@@ -3,7 +3,6 @@
 # CSheeran
 # Team 4, CSUS EEE193B
 
-
 # pylint: disable=global-statement,stop-iteration-return,no-self-use,useless-super-delegation
 
 import csv          # Not being used 
