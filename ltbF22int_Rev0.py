@@ -1,11 +1,11 @@
-# Little Time Buddy-Integration with Capacitive TFT Screen-Release Code Rev. 0
+# Little Time Buddy-Integration with Capacitive TFT Screen-Release Code Rev. 1
 # 2022-10-09
 # CSheeran
 # Team 4, CSUS EEE193B
 
 # pylint: disable=global-statement,stop-iteration-return,no-self-use,useless-super-delegation
 
-import csv          # Not being used 
+import csv          # Not being used
 import serial
 import gpiozero
 
@@ -33,9 +33,18 @@ TESTING = False
 ################################################################################
 # Setup hardware
 
-# Input Pins
-switch_1 = gpiozero.Button(5, pull_up=False)
-switch_2 = gpiozero.Button(6, pull_up=False)
+# Adafruit 2.8" TFT Capacitive Touchscreen operates the following pins:
+# I2C for touch sensing: Pin3-GPIO 2 (SDA), Pin5-GPIO 3 (SCL). Be sure to include the RTC on the I2C bus
+# SPI pins: (SCK) Pin23-GPIO 11, (MOSI) Pin19-GPIO 10, (MISO) Pin21-GPIO 9, (CE0) Pin24-GPIO 8.
+# Also: Pin18-GPIO 24, Pin22-GPIO 25
+
+# Input Pins, DESIGNATED BY GPIO#
+switch_1 = gpiozero.Button(4, pull_up=False)   # And/Or read the output pin below, DEMO green wire
+switch_2 = gpiozero.Button(6, pull_up=False)   # And/Or read the output pin below, DEMO blue wire
+
+# Output Pins, DESIGATED BY PIN# NOT GPIO#
+gui_out1 = gpiozero.DigitalOutputDevice(29,active_high=True, initial_value=False)   # GUI button 1 is on the left side of the screen, DEMO orange wire
+gui_out2 = gpiozero.DigitalOutputDevice(36, active_high=True, initial_value=False)  # GUI button 2 is o the right side of the screen, DEMO yellow wire
 
 
 #################################################################################################
@@ -68,6 +77,21 @@ def log(s):
     if TESTING:
         print(s)
 
+################################################################################
+# Global Variables
+
+# Profile and Task Names created by user in the desktop application
+# Import these from a .csv file
+# Assign each of these to the class names for each relevant child state
+
+#HomeName=userHome
+#P1Name=userP1
+#P1t11Name=userP1t1
+#P1t11Name=userP1t1
+#P2Name=userP2
+#P1t11Name=userP1t1
+#P1t11Name=userP1t1
+
 
 ################################################################################
 # State Machine, Manages states
@@ -90,64 +114,51 @@ class StateMachine(object):                         # Question: Why is the argum
         log('Entering %s' % (self.state.name))
         self.state.enter(self)
 
-    def pressed1(self):                              # "button pressed" attribute. Accessed at the end of each loop, applies a pause and prints confirmaiton if setup.
+    def pressed(self):                              # "button pressed" attribute. Accessed at the end of each loop, applies a pause and prints confirmaiton if setup.
         if self.state:
             log('Updating %s' % (self.state.name))
             self.state.pressed(self)
             #print("'StateMachine' Class occurrence")  # Use this print statement to understand how the states transition here to update the state in the serial monitor
             t.sleep(.50)                             # Critial pause needed to prevent the serial monitor from being "flooded" with data and crashing
 
-    def pressed2(self):                              # "button pressed" attribute. Accessed at the end of each loop, applies a pause and prints confirmaiton if setup.
-        if self.state:
-            log('Updating %s' % (self.state.name))
-            self.state.pressed(self)
-            t.sleep(.50)                             # Critial pause needed to prevent the serial monitor from being "flooded" with data and crashing
-
 
 ################################################################################
-# States in the form of classes/individual modules
+# States
 
-class State(object):            # Question: Why is the argument named "object?"
+# Abstract parent state class: I'm not 100% sure that this state is the "parent class" for the states below.
+# So far "StateMachine" appears to be the parent class
+# some clarification is needed to indentify how a class is called by "super().__init__()" (aka "Inheritance") & @property
+
+class State(object):
 
 
-    def __init__(self):                               # Constructor. Sets variables for the class, in this instance only, "self". Note machine variable below in the "enter" attribute
+    def __init__(self):         # Constructor. Sets variables for the class, in this instance only, "self". Note machine variable below in the "enter" attribute
 
         @property
-        def name(self):                               # Attribute. Only the name is returned in states below. The State object shouldn't be called and returns nothing
+        def name(self):             # Attribute. Only the name is returned in states below. The State object shouldn't be called and returns nothing
             return ''
 
-    def enter(self, machine):                         # Class Attribute. Does what is commanded when the state is entered
+    def enter(self, machine):   # Class Attribute. Does what is commanded when the state is entered
         pass
 
-    def exit(self, machine):                          # Class Attribute. Does what is commanded when exiting the state
+    def exit(self, machine):    # Class Attribute. Does what is commanded when exiting the state
         pass
 
-    def pressed1(self, machine):                      # Pressed is never called
-
-    def pressed2(self, machine): 
-
+    def pressed(self, machine): # Class Attribute. Does what is commanded when a button is pressed
+        print("'State' Class occurrence")   #This hasn't been called yet, I used this as a test to investigate the "inheritance" of child classes below.
 
 ########################################
 # This state is active when powered on and other states return here
 class Home(State):
 
-    #tkinter Home GUI
-    win = Tk()  # setting up window from Tk() naming win
-    myFont = font.Font(family='Helvetica', size=18, weight='bold')  # setting up font naming myfont
+    # Declare global variables for the Home State
+    global gui_btn1, gui_btn2                       # Create variables to store if a button is pressed in GUi
+    global gui_out1, gui_out2
+    global win
 
-    # Define the tkinter window instance
-    win.title("ltb Home")                                           # title for window
-    win.geometry('400x300')                                         # Dimensions of the window, 320x240 is the dimensions of the adafruit PiTFT capacitive screen
-    win.eval('tk::PlaceWindow . center')                            # Place the window in the center of the screen, Q: is the Raspberry Screen setup correctly?
-    win.attributes('-fullscreen', True)
-    # Define the tkinter SW1 instance
-    SW1Button = Button(win, text="SW 1 OFF", font=myFont, command=SW1ON, height=2, width=8)  # setting button naming led1Button
-    #SW1Button.place(x=37, y=50)                                    # button position for led1Button #commanding to button to led1ON function
-    SW1Button.pack(side=LEFT, anchor=W)
-
-    SW2Button = Button(win, text="SW 2 OFF", font=myFont, command=SW2ON, height=2, width=8)  # setting button naming led2Button
-    #SW2Button.place(x=520, y=50)                                   # button position for led2Button #commanding to button to led2ON function
-    SW2Button.pack(side=RIGHT, anchor=E)
+    #Intitalize the global variables within "Tracking1"
+    gui_btn1 = False
+    gui_btn2 = False
 
 
     def __init__(self):
@@ -159,30 +170,85 @@ class Home(State):
         return 'Home'
 
     def enter(self, machine):
-        State.enter(self, machine)
+        global win
+        global gui_btn1, gui_out1
+        global gui_btn1, gui_out2
 
-        print('#### Home State ####')  # Print "Home State" to the serial monitor
-        
+        State.enter(self, machine)
+        print('#### Home [State] ####')  # Print "Home State" to the serial monitor
+        #gui_out1.value=True                       # Sets GPIO output pin 13
+        #gui_out2.value=True                       # Sets GPIO output pin 13
+
+        # tkinter Home Screen GUI
+        win = Tk()  # setting up window from Tk() naming win
+        myFont = font.Font(family='Helvetica', size=18, weight='bold')  # setting up font naming myfont
+        # Define the tkinter window instance
+        win.title("ltb Home")                                           # title for window
+        win.geometry('400x300')                                         # Dimensions of the window, 320x240 is the dimensions of the adafruit PiTFT capacitive screen
+        win.eval('tk::PlaceWindow . center')                            # Place the window in the center of the screen, Q: is the Raspberry Screen setup correctly?
+        #win.attributes('-fullscreen', True)                            # uncomment to use fullscreen
+
+
+        def SW1ON():
+            global gui_btn1, gui_out1
+            gui_btn1=True                                               # GUI button 1 was pressed, sets Home State variable to True
+            gui_out1.value=True                                         # Sets GPIO output
+
+            #t.sleep(5)
+            #win.quit()
+            #win.destroy()  # This was previously win.quit(), quit() doesn't close the window
+
+        def SW2ON():
+            global gui_btn1, gui_out2
+            gui_btn2=True                                               # GUI button 1 was pressed, sets Home State variable to True
+            gui_out2.value=True                                         # Sets GPIO output
+
+            #t.sleep(5)
+            #win.quit()
+            #win.destroy()                                               # This was previously win.quit(), but doesn't close the window
+
+        # Define the tkinter switch instances
+        SW1Button = Button(win, text="Profile 1", font=myFont, command=SW1ON, height=2, width=8)  # setting button naming led1Button
+        #SW1Button.place(x=37, y=50)                                    # button position for led1Button #commanding to button to led1ON function
+        SW1Button.pack(side=LEFT, anchor=W)
+
+        SW2Button = Button(win, text="Profile 2", font=myFont, command=SW2ON, height=2, width=8)  # setting button naming led2Button
+        #SW2Button.place(x=520, y=50)                                   # button position for led2Button #commanding to button to led2ON function
+        SW2Button.pack(side=RIGHT, anchor=E)
+
+        # Focus Button
+        Fbtn = tk.Button(win, text="Focus",font= ("Calibri",10), bg="white", fg="black")
+        Fbtn.pack(side=TOP, anchor=E)
+
+        mainloop()  # commanding mainloop for starting main loop
+
+
         t.sleep(2)
 
     def exit(self, machine):
+        global win
         State.exit(self, machine)
 
         # Haptic placeholder
-        # Sound placeholder 
+        # Sound placeholder
 
         #GUI shutdown when leaving this state
-        print("Exit Button pressed")
-        GPIO.cleanup()  # Quitting program
-        win.destroy()  # This was previously win.quit(), but doesn't close the window
+        print("Exit Home State")
+        gui_out1.value=False                     # Clears GPIO output pin 15
+        gui_out2.value=False                      # Clears GPIO output pin 15
+        gui_btn1=False                      # Clears Home State variable value
+        gui_btn2=False                      # Clears Home State variable value
 
-    def pressed1(self, machine):
-        if switch_1.is_pressed:                                         #
+
+
+    def pressed(self, machine):             # pressed is the mechanism needed to switch between states
+
+        if switch_1.is_pressed:
             machine.go_to_state('Profile 1')
-
-    def pressed2(self, machine):
         if switch_2.is_pressed:
             machine.go_to_state('Profile 2')
+
+
 
 
 ########################################
@@ -201,7 +267,7 @@ class FocusTimer(State):
     def enter(self, machine):
         State.enter(self, machine)
 
-        print('#### Focus Timer 1 State ####')
+        print('#### Focus Timer 1 [State] ####')
 
         t.sleep(2)
 
@@ -209,14 +275,13 @@ class FocusTimer(State):
         State.exit(self, machine)
 
         # Haptic placeholder
-        # Sound placeholder 
+        # Sound placeholder
 
-    def pressed1(self, machine):
-        if switch_1.is_pressed:                   # Either button press results in a transition to the "Home" state
+    def pressed(self, machine):
+
+        if switch_1.is_pressed:
             machine.go_to_state('Home')
-
-    def pressed2(self, machine):
-        if switch_2.is_pressed:                   # Question: Perhaps a transition to "Profile1" is more appropriate?
+        if switch_2.is_pressed:
             machine.go_to_state('Home')
 
 
@@ -237,7 +302,7 @@ class Profile1(State):
     def enter(self, machine):
         State.enter(self, machine)
 
-        print('#### Profile 1 State ####')
+        print('#### Profile 1 [State] ####')
 
         t.sleep(3)
 
@@ -245,13 +310,12 @@ class Profile1(State):
         State.exit(self, machine)
 
         # Haptic placeholder
-        # Sound placeholder 
+        # Sound placeholder
 
-    def pressed1(self, machine):
-        if switch_1.is_pressed:
+    def pressed(self, machine):
+
+        if switch_1.is_pressed:                                         #
             machine.go_to_state('P1_Tracking1')
-
-    def pressed2(self, machine):
         if switch_2.is_pressed:
             machine.go_to_state('P2_Tracking2')
 
@@ -279,7 +343,7 @@ class P1_Tracking1(State):
 
     @property
     def name(self):
-        return 'Tracking1'
+        return 'P1_Tracking1'
 
     def enter(self, machine):
         global time_zone_in, time_zone_out
@@ -295,11 +359,11 @@ class P1_Tracking1(State):
         # Components of the "time in" stamp
         time_zone_in = timestamp_in.tzname()    # Stores the timezone from datetime
 
-        print('#### Tracking Task 1 State ####')
+        print('#### Profile 1, Tracking Task 1 [State] ####')
 
         print('Logging a START time to .csv file')
          # appending timestamp to file, Use "a" to append file, "w" will overwrite data in the file, "r" will read lines from the file.
-        with open("/home/pi/Desktop/LTB_Code_Release/Tracking_1.csv", "a") as f:
+        with open("/home/pi/Desktop/ltb_f22_release/P1_t1.csv", "a") as f:
 
             #led.value = True    # turn on LED to indicate writing entries
             print("Time zone 'in':",time_zone_in) #Prints data about to be written to the SD card
@@ -340,7 +404,7 @@ class P1_Tracking1(State):
 
         print('Logging a STOP time to .csv\n')
         # appending timestamp to file, Use "a" to append file, "w" will overwrite data in the file, "r" will read lines from the file.
-        with open("/home/pi/Desktop/LTB_Code_Release/Tracking_1.csv", "a") as f:
+        with open("/home/pi/Desktop/ltb_f22_release/P1_t1.csv", "a") as f:
             #led.value = True    # turn on LED to indicate writing entries
             print("Time zone 'out':",time_zone_out) #Prints data about to be written to the SD card
             print(str(today) + '_' + str(timestamp_out.hour) + ':' + str(timestamp_out.minute) + ":" + str(timestamp_out.second) + ",")
@@ -360,15 +424,14 @@ class P1_Tracking1(State):
             #line = f.readline()
 
         # Haptic placeholder
-        # Sound placeholder 
+        # Sound placeholder
 
-    def pressed1(self, machine):
+    def pressed(self, machine):
+
         if switch_1.is_pressed:
-            machine.go_to_state('Voice Note')
-
-     def pressed2(self, machine):
+            machine.go_to_state('Home')     # Placeholder for a Pause Button & Pause State
         if switch_2.is_pressed:
-            machine.go_to_state('Voice Note')
+            machine.go_to_state('Profile1')     # Placeholder for a Stop button, return to Profile 1
 
 
 ########################################
@@ -394,7 +457,7 @@ class P1_Tracking2(State):
 
     @property
     def name(self):
-        return 'Tracking1'
+        return 'P1_Tracking2'
 
     def enter(self, machine):
         global time_zone_in, time_zone_out
@@ -410,11 +473,11 @@ class P1_Tracking2(State):
         # Components of the "time in" stamp
         time_zone_in = timestamp_in.tzname()    # Stores the timezone from datetime
 
-        print('#### Tracking Task 1 State ####')
+        print('#### Profile 1, Tracking Task 2 [State] ####')
 
         print('Logging a START time to .csv file')
          # appending timestamp to file, Use "a" to append file, "w" will overwrite data in the file, "r" will read lines from the file.
-        with open("/home/pi/Desktop/LTB_Code_Release/Tracking_1.csv", "a") as f:
+        with open("/home/pi/Desktop/ltb_f22_release/P1_t2.csv", "a") as f:
 
             #led.value = True    # turn on LED to indicate writing entries
             print("Time zone 'in':",time_zone_in) #Prints data about to be written to the SD card
@@ -454,7 +517,7 @@ class P1_Tracking2(State):
 
         print('Logging a STOP time to .csv\n')
         # appending timestamp to file, Use "a" to append file, "w" will overwrite data in the file, "r" will read lines from the file.
-        with open("/home/pi/Desktop/LTB_Code_Release/Tracking_1.csv", "a") as f:
+        with open("/home/pi/Desktop/ltb_f22_release/P1_t2.csv", "a") as f:
             #led.value = True    # turn on LED to indicate writing entries
             print("Time zone 'out':",time_zone_out) #Prints data about to be written to the SD card
             print(str(today) + '_' + str(timestamp_out.hour) + ':' + str(timestamp_out.minute) + ":" + str(timestamp_out.second) + ",")
@@ -474,15 +537,14 @@ class P1_Tracking2(State):
             #line = f.readline()
 
         # Haptic placeholder
-        # Sound placeholder 
+        # Sound placeholder
 
-    def pressed1(self, machine):
+    def pressed(self, machine):
+
         if switch_1.is_pressed:
-            machine.go_to_state('Voice Note')
-
-     def pressed2(self, machine):
+            machine.go_to_state('Home')     # Placeholder for a Pause Button & Pause State
         if switch_2.is_pressed:
-            machine.go_to_state('Voice Note')
+            machine.go_to_state('Profile 1')     # Placeholder for a Stop button, return to Profile 1
 
 
 ########################################
@@ -502,7 +564,7 @@ class Profile2(State):
     def enter(self, machine):
         State.enter(self, machine)
 
-        print('#### Profile 2 State ####')
+        print('#### Profile 2 [State] ####')
 
         t.sleep(2)
 
@@ -510,7 +572,7 @@ class Profile2(State):
         State.exit(self, machine)
 
         # Haptic placeholder
-        # Sound placeholder 
+        # Sound placeholder
 
     def pressed(self, machine):
         if switch_1.is_pressed:
@@ -544,7 +606,7 @@ class P2_Tracking1(State):
 
     @property
     def name(self):
-        return 'Tracking1'
+        return 'P2_Tracking1'
 
     def enter(self, machine):
         global time_zone_in, time_zone_out
@@ -560,11 +622,11 @@ class P2_Tracking1(State):
         # Components of the "time in" stamp
         time_zone_in = timestamp_in.tzname()    # Stores the timezone from datetime
 
-        print('#### Tracking Task 1 State ####')
+        print('#### Profile 2, Tracking Task 1 [State] ####')
 
         print('Logging a START time to .csv file')
          # appending timestamp to file, Use "a" to append file, "w" will overwrite data in the file, "r" will read lines from the file.
-        with open("/home/pi/Desktop/LTB_Code_Release/Tracking_1.csv", "a") as f:
+        with open("/home/pi/Desktop/ltb_f22_release/P2_t1.csv", "a") as f:
 
             #led.value = True    # turn on LED to indicate writing entries
             print("Time zone 'in':",time_zone_in) #Prints data about to be written to the SD card
@@ -605,7 +667,7 @@ class P2_Tracking1(State):
 
         print('Logging a STOP time to .csv\n')
         # appending timestamp to file, Use "a" to append file, "w" will overwrite data in the file, "r" will read lines from the file.
-        with open("/home/pi/Desktop/LTB_Code_Release/Tracking_1.csv", "a") as f:
+        with open("/home/pi/Desktop/ltb_f22_release/P2_t1.csv", "a") as f:
             #led.value = True    # turn on LED to indicate writing entries
             print("Time zone 'out':",time_zone_out) #Prints data about to be written to the SD card
             print(str(today) + '_' + str(timestamp_out.hour) + ':' + str(timestamp_out.minute) + ":" + str(timestamp_out.second) + ",")
@@ -625,15 +687,14 @@ class P2_Tracking1(State):
             #line = f.readline()
 
         # Haptic placeholder
-        # Sound placeholder 
+        # Sound placeholder
 
-    def pressed1(self, machine):
+    def pressed(self, machine):
+
         if switch_1.is_pressed:
-            machine.go_to_state('Voice Note')
-
-     def pressed2(self, machine):
+            machine.go_to_state('Home')         # Placeholder for a Pause Button & Pause State
         if switch_2.is_pressed:
-            machine.go_to_state('Voice Note')
+            machine.go_to_state('Profile 2')    # Placeholder for a Stop button, return to Profile 2
 
 
 ########################################
@@ -659,7 +720,7 @@ class P2_Tracking2(State):
 
     @property
     def name(self):
-        return 'Tracking1'
+        return 'P2_Tracking2'
 
     def enter(self, machine):
         global time_zone_in, time_zone_out
@@ -675,11 +736,11 @@ class P2_Tracking2(State):
         # Components of the "time in" stamp
         time_zone_in = timestamp_in.tzname()    # Stores the timezone from datetime
 
-        print('#### Tracking Task 1 State ####')
+        print('#### Profile 2, Tracking Task 2 [State] ####')
 
         print('Logging a START time to .csv file')
          # appending timestamp to file, Use "a" to append file, "w" will overwrite data in the file, "r" will read lines from the file.
-        with open("/home/pi/Desktop/LTB_Code_Release/Tracking_1.csv", "a") as f:
+        with open("/home/pi/Desktop/ltb_f22_release/P2_t2.csv", "a") as f:
 
             #led.value = True    # turn on LED to indicate writing entries
             print("Time zone 'in':",time_zone_in) #Prints data about to be written to the SD card
@@ -720,7 +781,7 @@ class P2_Tracking2(State):
 
         print('Logging a STOP time to .csv\n')
         # appending timestamp to file, Use "a" to append file, "w" will overwrite data in the file, "r" will read lines from the file.
-        with open("/home/pi/Desktop/LTB_Code_Release/Tracking_1.csv", "a") as f:
+        with open("/home/pi/Desktop/ltb_f22_release/P2_t2.csv", "a") as f:
             #led.value = True    # turn on LED to indicate writing entries
             print("Time zone 'out':",time_zone_out) #Prints data about to be written to the SD card
             print(str(today) + '_' + str(timestamp_out.hour) + ':' + str(timestamp_out.minute) + ":" + str(timestamp_out.second) + ",")
@@ -740,15 +801,14 @@ class P2_Tracking2(State):
             #line = f.readline()
 
         # Haptic placeholder
-        # Sound placeholder 
+        # Sound placeholder
 
-    def pressed1(self, machine):
+    def pressed(self, machine):
+
         if switch_1.is_pressed:
-            machine.go_to_state('Voice Note')
-
-     def pressed2(self, machine):
+            machine.go_to_state('Home')     # Placeholder for a Pause Button & Pause State
         if switch_2.is_pressed:
-            machine.go_to_state('Voice Note')
+            machine.go_to_state('Profile 2')     # Placeholder for a Stop button, return to Profile 2
 
 
 ################################################################################
