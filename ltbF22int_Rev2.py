@@ -1,4 +1,4 @@
-# Little Time Buddy-Integration with Capacitive TFT Screen-Release Code Rev. 1
+# Little Time Buddy-Integration with Capacitive TFT Screen-Release Code Rev. 2
 # 2022-10-09
 # CSheeran
 # Team 4, CSUS EEE193B
@@ -28,7 +28,7 @@ import RPi.GPIO as GPIO
 ###############################################################################
 
 # Set to false to disable testing/tracing code
-TESTING = False
+TESTING = True
 
 ################################################################################
 # Setup hardware
@@ -39,12 +39,12 @@ TESTING = False
 # Also: Pin18-GPIO 24, Pin22-GPIO 25
 
 # Input Pins, DESIGNATED BY GPIO#
-switch_1 = gpiozero.Button(4, pull_up=False)   # And/Or read the output pin below, DEMO green wire
+switch_1 = gpiozero.Button(26, pull_up=False)   # And/Or read the output pin below, DEMO green wire
 switch_2 = gpiozero.Button(6, pull_up=False)   # And/Or read the output pin below, DEMO blue wire
 
 # Output Pins, DESIGATED BY PIN# NOT GPIO#
-gui_out1 = gpiozero.DigitalOutputDevice(29,active_high=True, initial_value=False)   # GUI button 1 is on the left side of the screen, DEMO orange wire
-gui_out2 = gpiozero.DigitalOutputDevice(36, active_high=True, initial_value=False)  # GUI button 2 is o the right side of the screen, DEMO yellow wire
+gui_out1 = gpiozero.DigitalOutputDevice(23,active_high=True, initial_value=False)   # GUI button 1 is on the left side of the screen, DEMO orange wire
+gui_out2 = gpiozero.DigitalOutputDevice(24, active_high=True, initial_value=False)  # GUI button 2 is o the right side of the screen, DEMO yellow wire
 
 
 #################################################################################################
@@ -194,18 +194,22 @@ class Home(State):
             gui_btn1=True                                               # GUI button 1 was pressed, sets Home State variable to True
             gui_out1.value=True                                         # Sets GPIO output
 
-            #t.sleep(5)
-            #win.quit()
-            #win.destroy()  # This was previously win.quit(), quit() doesn't close the window
+            t.sleep(5)
+            print(gui_btn1)
+            print(gui_btn2)
+            win.quit()
+            win.destroy()  # This was previously win.quit(), quit() doesn't close the window
 
         def SW2ON():
             global gui_btn1, gui_out2
             gui_btn2=True                                               # GUI button 1 was pressed, sets Home State variable to True
             gui_out2.value=True                                         # Sets GPIO output
 
-            #t.sleep(5)
-            #win.quit()
-            #win.destroy()                                               # This was previously win.quit(), but doesn't close the window
+            t.sleep(5)
+            print(gui_btn1)
+            print(gui_btn2)
+            win.quit()
+            win.destroy()                                               # This was previously win.quit(), but doesn't close the window
 
         # Define the tkinter switch instances
         SW1Button = Button(win, text="Profile 1", font=myFont, command=SW1ON, height=2, width=8)  # setting button naming led1Button
@@ -267,7 +271,7 @@ class FocusTimer(State):
     def enter(self, machine):
         State.enter(self, machine)
 
-        print('#### Focus Timer 1 [State] ####')
+        print('#### Focus Timer [State] ####')
 
         t.sleep(2)
 
