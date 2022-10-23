@@ -432,12 +432,13 @@ class Timecard(State):
         #win.attributes('-fullscreen', True)                                                # uncomment to use fullscreen
 
         def SW1ON():
-            global stamp1
             gui_out1.value=True                                         # Sets GPIO output for testing
             print("gui_out1 = ", gui_out1.value)
+            
             # Try to flash a tnkinter label representing the time tracked
+            #stamp1 = "timestamp screen test"
             #p1t1Label.config(text = stamp1)
-            print("stamp1 = ", stamp1)
+            #print("stamp1 = ", stamp1)
 
             # Haptic placeholder
             # Sound placeholder
@@ -451,9 +452,10 @@ class Timecard(State):
             #global p1t1Label["text"] = "Timecard tracked: xx:xx:xx"
             gui_out2.value=True                                         # Sets GPIO output
             print("gui_out2 = ", gui_out2.value)
+            
             # Haptic placeholder
             # Sound placeholder
-            t.sleep(2)
+            
             win.quit()
             win.destroy()                                               # Closes GUI window
             machine.go_to_state('Home')
