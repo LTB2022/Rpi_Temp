@@ -1,3 +1,14 @@
+# Little Time Buddy-Custom Tkinter test GUI Rev.0
+# 2022-10-30
+# MHernandez
+# Team 4, CSUS EEE193B
+
+# Please download customtkinter before running the code
+# pip3 install customtkinter
+# or pip3 install customtkinter --upgrade
+
+
+
 import tkinter
 import tkinter.messagebox
 import customtkinter
