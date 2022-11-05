@@ -1,6 +1,6 @@
 # Little Time Buddy-
-# Integration with Capacitive TFT Screen-Release and customTkinter Code Rev. 8
-# 2022-11-02
+# Integration with Capacitive TFT Screen-Release and customtkinter Code Rev. 8
+# 2022-11-05
 # CSheeran
 # MHernandez
 # Team 4, CSUS EEE193B
@@ -31,7 +31,7 @@ import RPi.GPIO as GPIO
 ###############################################################################
 
 # Set to false to disable testing/tracing code
-TESTING = True
+TESTING = False
 
 ################################################################################
 # Setup hardware
@@ -163,7 +163,7 @@ class Home(State):
         #win.attributes('-fullscreen', True)                            # uncomment to use fullscreen
         # Window frame for the profile buttons
         win.frame = customtkinter.CTkFrame(master=win, width=320, height=180, corner_radius=8)
-        win.frame.place(relx=0.5, rely=0.62, anchor=tkinter.CENTER)
+        win.frame.place(relx=0.5, rely=0.62, anchor=customtkinter.CENTER)
 
         def SW1ON():
             #global stamp1
@@ -200,16 +200,16 @@ class Home(State):
         def get_time():
             time_Var = time.strftime("%I:%M:%S %p")
             date_Var = time.strftime("%Y-%m-%d")
-            clock.config(text= time_Var)
-            date.config(text= date_Var)
+            clock.configure(text= time_Var)
+            date.configure(text= date_Var)
             clock.after(200, get_time)
 
         # Home Label
-        LTB_label = tkinter.StringVar(value="LTB\n" + "Litte Time Buddy")
+        LTB_label = customtkinter.StringVar(value="LTB\n" + "Litte Time Buddy")
         label = customtkinter.CTkLabel(master=win, textvariable=LTB_label, width=120, height=25,
                                        fg_color=("white", "black"),
                                        corner_radius=4)
-        label.place(relx=0.82, rely=0.06, anchor=tkinter.CENTER)
+        label.place(relx=0.82, rely=0.06, anchor=customtkinter.CENTER)
         # Define the tkinter switch instances
         SW1Button = customtkinter.CTkButton(master=win, text="EE Intern", command=SW1ON)
         SW1Button.place(relx=0.55, rely=0.8, anchor=customtkinter.W)
@@ -221,18 +221,18 @@ class Home(State):
         Fbtn.place(relx=0.63, rely=0.14, anchor=customtkinter.NW)
         # Display Parameters for the Clock
         clkText = customtkinter.CTkLabel(master=win, text="Time:")
-        clkText.place(relx=-0.15, rely=0.08, anchor=tkinter.NW)
+        clkText.place(relx=-0.15, rely=0.08, anchor=customtkinter.NW)
         clock = customtkinter.CTkLabel(master=win,
                                        width=60,
                                        height=25)
-        clock.place(relx=0.13, rely=0.09, anchor=tkinter.NW)
+        clock.place(relx=0.13, rely=0.09, anchor=customtkinter.NW)
         # Display Parameters for the Date
         datetxt = customtkinter.CTkLabel(master=win, text="Date:")
-        datetxt.place(relx=-0.15, rely=-0.01, anchor=tkinter.NW)
+        datetxt.place(relx=-0.15, rely=-0.01, anchor=customtkinter.NW)
         date = customtkinter.CTkLabel(master=win,
                                       width=60,
                                       height=25)
-        date.place(relx=0.13, rely=0.00, anchor=tkinter.NW)
+        date.place(relx=0.13, rely=0.00, anchor=customtkinter.NW)
         get_time()
         # Starting tkinter main GUI loop
         mainloop()  # commanding mainloop for starting main loop
@@ -277,7 +277,7 @@ class FocusTimer(State):
         State.enter(self, machine)
         print('#### Focus Timer State ####')                                   # Print "Home State" to the serial monitor
 
-        # customTkinter Focus GUI
+        # customtkinter Focus GUI
         customtkinter.set_appearance_mode("light")     # Modes: system (default), light, dark
         customtkinter.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, green
         # Define the tkinter window instance
@@ -288,7 +288,7 @@ class FocusTimer(State):
         #win.attributes('-fullscreen', True)                            # uncomment to use fullscreen
         # Window frame for the profile buttons
         win.frame = customtkinter.CTkFrame(master=win, width=320, height=180, corner_radius=8)
-        win.frame.place(relx=0.5, rely=0.62, anchor=tkinter.CENTER)
+        win.frame.place(relx=0.5, rely=0.62, anchor=customtkinter.CENTER)
 
         def SW1ON():
             redLED.value=True                                         # Sets GPIO output
@@ -321,10 +321,10 @@ class FocusTimer(State):
         def button_function():
             print("button pressed")
         # Focus Timer tkinter Label
-        focuslabel = tkinter.StringVar(value="Focus\n" + "Timer\n" + "-Focusing-")
+        focuslabel = customtkinter.StringVar(value="Focus\n" + "Timer\n" + "-Focusing-")
         fkslabel = customtkinter.CTkLabel(master=win, textvariable=focuslabel, width=120, height=25,
                                           fg_color=("white", "black"), corner_radius=4)
-        fkslabel.place(relx=0.82, rely=0.109, anchor=tkinter.CENTER)
+        fkslabel.place(relx=0.82, rely=0.109, anchor=customtkinter.CENTER)
         # Define the tkinter switch instances
         SW1Button = customtkinter.CTkButton(master=win, text="Start", command=SW1ON)
         SW1Button.place(relx=0.55, rely=0.7, anchor=customtkinter.SW)
@@ -380,18 +380,18 @@ class EEIntern(State):
 
         print('#### EE Intern / Profile1 State ####')
 
-        # customTkinter EEInter Screen GUI
+        # customtkinter GUI for Profile1
         customtkinter.set_appearance_mode("light")     # Modes: system (default), light, dark
         customtkinter.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, green
         win = customtkinter.CTk()                     # create CTk window like you do with the Tk window
         # Define the tkinter window instance
         win.title("EE Intern Profile")                                  # title for window
-        win.geometry('400x300')                                         # Dimensions of the window, 320x240 is the dimensions of the adafruit PiTFT capacitive screen
+        win.geometry('320x240')                                         # Dimensions of the window, 320x240 is the dimensions of the adafruit PiTFT capacitive screen
         win.eval('tk::PlaceWindow . center')                            # Place the window in the center of the screen, Q: is the Raspberry Screen setup correctly?
         #win.attributes('-fullscreen', True)                            # uncomment to use fullscreen
         # Window frame for the profile buttons
         win.frame = customtkinter.CTkFrame(master=win, width=320, height=180, corner_radius=8)
-        win.frame.place(relx=0.5, rely=0.62, anchor=tkinter.CENTER)
+        win.frame.place(relx=0.5, rely=0.62, anchor=customtkinter.CENTER)
 
         def SW1ON():
             gui_out1.value=True                                         # Sets GPIO output
@@ -414,10 +414,10 @@ class EEIntern(State):
             machine.go_to_state('EEProject')
 
         # Profile1 tkinter Label
-        Intern_label = tkinter.StringVar(value="Engineering\n" + "Intern")
+        Intern_label = customtkinter.StringVar(value="Engineering\n" + "Intern")
         label = customtkinter.CTkLabel(master=win, textvariable=Intern_label, width=120, height=25,
                                        fg_color=("white", "black"), corner_radius=4)
-        label.place(relx=0.82, rely=0.07, anchor=tkinter.CENTER)
+        label.place(relx=0.82, rely=0.07, anchor=customtkinter.CENTER)
         # Define the tkinter switch instances
         SW1Button = customtkinter.CTkButton(master=win, text="Timecard", command=SW1ON)
         SW1Button.place(relx=0.55, rely=0.8, anchor=customtkinter.W)
@@ -493,7 +493,7 @@ class Timecard(State):
             f.write(str(today) + '_' + str(timestamp_in.hour) + ':' + str(timestamp_in.minute) + ":" + str(timestamp_in.second) + ",")
             redLED.value = False  # turn off LED to indicate we're done
 
-        # customTkinter Home Screen GUI
+        # customtkinter GUI for Profile1, Task1
         customtkinter.set_appearance_mode("light")  # Modes: system (default), light, dark
         customtkinter.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, gree
         win = customtkinter.CTk()  # create CTk window like you do with the Tk window
@@ -504,7 +504,7 @@ class Timecard(State):
         # win.attributes('-fullscreen', True)                            # uncomment to use fullscreen
         # Window frame for the profile buttons
         win.frame = customtkinter.CTkFrame(master=win, width=320, height=180, corner_radius=8)
-        win.frame.place(relx=0.5, rely=0.62, anchor=tkinter.CENTER)
+        win.frame.place(relx=0.5, rely=0.62, anchor=customtkinter.CENTER)
 
         def SW1ON():
             gui_out1.value=True                                              # Sets GPIO output for testing
@@ -576,14 +576,14 @@ class Timecard(State):
             win.destroy()                                               # Closes GUI window
             machine.go_to_state('Home')
 
-        # customTkinter Timecard Label
-        p1t1label = tkinter.StringVar(value="Timecard\n" + "-Tracking-")
+        # customtkinter Timecard Label
+        p1t1label = customtkinter.StringVar(value="Timecard\n" + "-Tracking-")
         label = customtkinter.CTkLabel(master=win, textvariable=p1t1label, width=120, height=25,
                                        fg_color=("white", "black"), corner_radius=4)
-        label.place(relx=0.82, rely=0.06, anchor=tkinter.CENTER)
+        label.place(relx=0.82, rely=0.06, anchor=customtkinter.CENTER)
         # Tracked time Label
-        trackLabel = Label(win, text="", foreground="black", font=myFont)
-        trackLabel.pack(side=TOP, anchor=N)
+        trackLabel = Label(win, text="", foreground="black")
+        trackLabel.pack(side=LEFT, anchor=CENTER)
         # Define the tkinter switch instances
         SW1Button = customtkinter.CTkButton(master=win, text="Stop", command=SW1ON)
         SW1Button.place(relx=0.55, rely=0.8, anchor=customtkinter.W)
@@ -663,7 +663,7 @@ class EEProject(State):
             redLED.value = False  # turn off LED to indicate we're done
 
 
-        # customTkinter Home Screen GUI
+        # customtkinter GUI for Profile1, Task2
         customtkinter.set_appearance_mode("light")  # Modes: system (default), light, dark
         customtkinter.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, gree
         win = customtkinter.CTk()  # create CTk window like you do with the Tk window
@@ -674,7 +674,7 @@ class EEProject(State):
         # win.attributes('-fullscreen', True)                            # uncomment to use fullscreen
         # Window frame for the profile buttons
         win.frame = customtkinter.CTkFrame(master=win, width=320, height=180, corner_radius=8)
-        win.frame.place(relx=0.5, rely=0.62, anchor=tkinter.CENTER)
+        win.frame.place(relx=0.5, rely=0.62, anchor=customtkinter.CENTER)
 
         # uncomment to use fullscreen
 
@@ -747,15 +747,15 @@ class EEProject(State):
             machine.go_to_state('Home')
 
         # tkinter Label
-        p1t2label = tkinter.StringVar(value="Intern Project\n" + "-Tracking-")
+        p1t2label = customtkinter.StringVar(value="Intern Project\n" + "-Tracking-")
         label = customtkinter.CTkLabel(master=win, textvariable=p1t2label, width=120, height=25,
                                        fg_color=("white", "black"), corner_radius=4)
-        label.place(relx=0.82, rely=0.07, anchor=tkinter.CENTER)
+        label.place(relx=0.82, rely=0.07, anchor=customtkinter.CENTER)
         # Tracked time Label
-        trackLabel = Label(win, text="", foreground="black", font=myFont)
-        trackLabel.pack(side=TOP, anchor=N)
+        trackLabel = Label(win, text="", foreground="black")
+        trackLabel.pack(side=LEFT, anchor=CENTER)
         # Define the tkinter switch instances
-        SSW1Button= customtkinter.CTkButton(master=win, text="Stop", command=SW1ON)
+        SW1Button= customtkinter.CTkButton(master=win, text="Stop", command=SW1ON)
         SW1Button.place(relx=0.55, rely=0.8, anchor=customtkinter.W)
         SW2Button = customtkinter.CTkButton(master=win, text="Home", command=SW2ON)
         SW2Button.place(relx=0.45, rely=0.8, anchor=customtkinter.E)
@@ -801,7 +801,7 @@ class EEE193B(State):
 
         print('#### CSUS Senior Project / Profile2 State ####')
 
-        # customTkinter Home Screen GUI
+        # customtkinter Profile2 GUI
         customtkinter.set_appearance_mode("light")                       # Modes: system (default), light, dark
         customtkinter.set_default_color_theme("blue")                    # Themes: blue (default), dark-blue, green
         win = customtkinter.CTk()                                        # create CTk window like you do with the Tk window
@@ -812,7 +812,7 @@ class EEE193B(State):
         # win.attributes('-fullscreen', True)                            # uncomment to use fullscreen
         # Window frame for the profile buttons
         win.frame = customtkinter.CTkFrame(master=win, width=320, height=180, corner_radius=8)
-        win.frame.place(relx=0.5, rely=0.62, anchor=tkinter.CENTER)
+        win.frame.place(relx=0.5, rely=0.62, anchor=customtkinter.CENTER)
 
         def SW1ON():
             gui_out1.value = True  # Sets GPIO output
@@ -834,12 +834,12 @@ class EEE193B(State):
             win.destroy()                                               # Closes GUI window
             machine.go_to_state('Development')
 
-        #customTkinter Label
-        EEE193B_label = tkinter.StringVar(value="Senior Project\n" + "193B\n" + "-Profile2-")
+        #customtkinter Label
+        EEE193B_label = customtkinter.StringVar(value="Senior Project\n" + "193B\n" + "-Profile2-")
         label = customtkinter.CTkLabel(master=win, textvariable=EEE193B_label, width=120, height=50,
                                    fg_color=("white", "black"), corner_radius=4)
-        label.place(relx=0.82, rely=0.099, anchor=tkinter.CENTER)
-        # Define the customTkinter switch instances
+        label.place(relx=0.82, rely=0.099, anchor=customtkinter.CENTER)
+        # Define the customtkinter switch instances
         SW1Button = customtkinter.CTkButton(master=win, text="Assignments", command=SW1ON)
         SW1Button.place(relx=0.55, rely=0.8, anchor=customtkinter.W)
         SW2Button = customtkinter.CTkButton(master=win, text="Development", command=SW2ON)
@@ -915,7 +915,7 @@ class Assignments(State):
             f.write(str(today) + '_' + str(timestamp_in.hour) + ':' + str(timestamp_in.minute) + ":" + str(timestamp_in.second) + ",")
             redLED.value = False                                         # turn off LED to indicate we're done
 
-        # customTkinter Home Screen GUI
+        # customtkinter Home Screen GUI
         customtkinter.set_appearance_mode("light")                       # Modes: system (default), light, dark
         customtkinter.set_default_color_theme("blue")                    # Themes: blue (default), dark-blue, green
         win = customtkinter.CTk()                                        # create CTk window like you do with the Tk window
@@ -926,7 +926,7 @@ class Assignments(State):
         # win.attributes('-fullscreen', True)                            # uncomment to use fullscreen
         # Window frame for the profile buttons
         win.frame = customtkinter.CTkFrame(master=win, width=320, height=180, corner_radius=8)
-        win.frame.place(relx=0.5, rely=0.62, anchor=tkinter.CENTER)
+        win.frame.place(relx=0.5, rely=0.62, anchor=customtkinter.CENTER)
 
         def SW1ON():
             gui_out1.value=True                                          # Sets GPIO output for testing
@@ -997,15 +997,14 @@ class Assignments(State):
             win.destroy()                                               # Closes GUI window
             machine.go_to_state('Home')
 
-        # Profile2 customTkinter Label
-        p2t1label = tkinter.StringVar(value="Senior Project\n" + "Assignment\n" + "-Tracking-")
+        # Profile2 customtkinter Label
+        p2t1label = customtkinter.StringVar(value="Senior Project\n" + "Assignment\n" + "-Tracking-")
         label = customtkinter.CTkLabel(master=win, textvariable=p2t1label, width=120, height=50,
                                        fg_color=("white", "black"), corner_radius=4)
-        label.place(relx=0.82, rely=0.109, anchor=tkinter.CENTER)
+        label.place(relx=0.82, rely=0.109, anchor=customtkinter.CENTER)
         # Tracked time Label
-        trackLabel = Label(win, text="", foreground="black", font=myFont)
-        trackLabel.pack(side=TOP, anchor=N)
-        # Define the tkinter switch instances
+        trackLabel = Label(win, text="", foreground="black")
+        trackLabel.pack(side=LEFT, anchor=CENTER)        # Define the tkinter switch instances
         SW1Button = customtkinter.CTkButton(master=win, text="Stop", command=SW1ON)
         SW1Button.place(relx=0.55, rely=0.8, anchor=customtkinter.W)
         SW2Button = customtkinter.CTkButton(master=win, text="Home", command=SW2ON)
@@ -1080,7 +1079,7 @@ class Development(State):
             f.write(str(today) + '_' + str(timestamp_in.hour) + ':' + str(timestamp_in.minute) + ":" + str(timestamp_in.second) + ",")
             redLED.value = False                                # turn off LED to indicate we're done
 
-        # customTkinter Home Screen GUI
+        # customtkinter Home Screen GUI
         customtkinter.set_appearance_mode("light")              # Modes: system (default), light, dark
         customtkinter.set_default_color_theme("blue")           # Themes: blue (default), dark-blue, green
         win = customtkinter.CTk()                               # create CTk window like you do with the Tk window
@@ -1091,7 +1090,7 @@ class Development(State):
         # win.attributes('-fullscreen', True)                   # uncomment to use fullscreen
         # Window frame for the profile buttons
         win.frame = customtkinter.CTkFrame(master=win, width=320, height=180, corner_radius=8)
-        win.frame.place(relx=0.5, rely=0.62, anchor=tkinter.CENTER)
+        win.frame.place(relx=0.5, rely=0.62, anchor=customtkinter.CENTER)
 
 
         def SW1ON():
@@ -1163,14 +1162,14 @@ class Development(State):
             win.destroy()                                               # Closes GUI window
             machine.go_to_state('Home')
 
-        # Profile2 Task2 customTkinter Label
-        p2t2label = tkinter.StringVar(value="Senior Project\n" + "Development\n" + "-Tracking-")
+        # Profile2 Task2 customtkinter Label
+        p2t2label = customtkinter.StringVar(value="Senior Project\n" + "Development\n" + "-Tracking-")
         label = customtkinter.CTkLabel(master=win, textvariable=p2t2label, width=120, height=25,
                                        fg_color=("white", "black"), corner_radius=4)
-        label.place(relx=0.82, rely=0.109, anchor=tkinter.CENTER)
+        label.place(relx=0.82, rely=0.109, anchor=customtkinter.CENTER)
         # Tracked time Label
-        trackLabel = Label(win, text="", foreground="black", font=myFont)
-        trackLabel.pack(side=TOP, anchor=N)
+        trackLabel = Label(win, text="", foreground="black")
+        trackLabel.pack(side=LEFT, anchor=CENTER)
         # Define the tkinter switch instances
         SW1Button = customtkinter.CTkButton(master=win, text="Stop", command=SW1ON)
         SW1Button.place(relx=0.55, rely=0.8, anchor=customtkinter.W)
