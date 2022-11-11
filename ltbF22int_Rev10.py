@@ -332,7 +332,7 @@ class FocusTimer(State):
                                           fg_color=("white", "black"), corner_radius=4)
         fkslabel.place(relx=0.82, rely=0.109, anchor=customtkinter.CENTER)
         # Countdown parameter label
-        paralabel = Label(win, text="Focusing for 52 mins,  Bitch", foreground="black")
+        paralabel = Label(win, text="Focusing for 52 mins", foreground="black")
         paralabel.place(relx=0.5, rely=0.3, anchor=CENTER)
         # Focus timer countdown label
         fucsLabel = Label(win, text="", foreground="black")
